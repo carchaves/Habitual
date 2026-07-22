@@ -7,11 +7,15 @@ export default async function handler(req, res) {
   if (!CODE_RE.test(code)) {
     return res.status(400).json({ error: "Código de sincronización inválido." });
   }
-  if (!process.env.UPSTASH_REDIS_REST_URL || !process.env.UPSTASH_REDIS_REST_TOKEN) {
+  // La integración "Upstash for Redis" del marketplace de Vercel expone estas
+  // variables con el prefijo KV_ (heredado de @vercel/kv), no el UPSTASH_ nativo.
+  const url = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
+  const token = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
+  if (!url || !token) {
     return res.status(500).json({ error: "Falta conectar el almacenamiento (Upstash Redis) en Vercel." });
   }
 
-  const redis = Redis.fromEnv();
+  const redis = new Redis({ url, token });
   const key = `habitual:${code}`;
 
   if (req.method === "GET") {
