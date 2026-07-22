@@ -1,0 +1,4 @@
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: #14161d; }
+body { -webkit-tap-highlight-color: transparent; }
+#root { min-height: 100vh; }

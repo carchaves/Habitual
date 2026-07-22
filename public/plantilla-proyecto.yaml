@@ -1,0 +1,115 @@
+# ══════════════════════════════════════════════════════════════════════
+# Habitual — plantilla + prompt para crear un proyecto
+# ══════════════════════════════════════════════════════════════════════
+#
+# ¿Cómo se usa?
+# 1. Descargá este archivo.
+# 2. Pegá TODO su contenido en un chat de Claude (u otro asistente), y
+#    contale tu proyecto: qué querés lograr, en qué etapas, con qué
+#    hábitos diarios y en qué horarios.
+# 3. Pedile que te devuelva el YAML completo siguiendo este formato,
+#    con los <placeholders> reemplazados por tu contenido real.
+# 4. Subí el archivo resultante en Habitual con "Importar proyecto".
+#
+# ------------------------------------------------------------------------
+# PROMPT (instrucciones para el asistente que arma el YAML):
+#
+# Quiero que generes un archivo YAML para la app "Habitual". Seguí
+# ESTRICTAMENTE el formato y las reglas de este archivo. No dejes
+# placeholders sin completar ni corchetes < > en la salida final.
+#
+# Formato:
+#   proyecto: <nombre del proyecto>          # obligatorio, texto
+#   descripcion: <descripción opcional>      # opcional, texto
+#   objetivos:                               # obligatorio, lista con al menos 1 elemento
+#     - nombre: <nombre del objetivo>        # obligatorio, texto
+#       descripcion: <descripción opcional>  # opcional, texto
+#       habitos:                             # obligatorio, lista con al menos 1 elemento
+#         - titulo: <título del hábito>      # obligatorio, texto
+#           descripcion: <descripción opcional>  # opcional, texto
+#           fecha: "AAAA-MM-DD"              # obligatorio, SIEMPRE entre comillas
+#           hora_inicio: "HH:MM"             # obligatorio, SIEMPRE entre comillas
+#           hora_fin: "HH:MM"                # obligatorio, SIEMPRE entre comillas, posterior a hora_inicio
+#           recurrente: true|false           # opcional, default false
+#
+# Reglas del modelo (respetalas al armar el contenido, no solo la sintaxis):
+#
+# 1. Jerarquía: un proyecto tiene varios objetivos; cada objetivo tiene
+#    varios hábitos.
+# 2. Orden: los objetivos se procesan en el orden en que aparecen en la
+#    lista. Solo el PRIMERO arranca activo. Los siguientes están
+#    bloqueados hasta que se completa el anterior — se desbloquean
+#    solos, en orden, uno por vez.
+# 3. Dentro de un objetivo activo, TODOS sus hábitos están vigentes en
+#    paralelo (no son secuenciales entre sí).
+# 4. "fecha" es el día desde el cual el hábito aparece en el checklist
+#    diario de la app (formato AAAA-MM-DD). Si es de hoy o del pasado,
+#    aparece inmediatamente; si es futura, aparece recién ese día.
+# 5. "hora_inicio" y "hora_fin" son OBLIGATORIOS en todo hábito y
+#    definen su franja horaria (formato HH:MM, 24 horas). Determinan
+#    dónde y con qué alto se dibuja el hábito en la grilla del horario
+#    semanal de la app — hora_inicio tiene que ser estrictamente
+#    anterior a hora_fin.
+# 6. "recurrente" define el TIPO de hábito, y de eso depende cómo se
+#    completa el objetivo:
+#    - recurrente: false (o ausente) → hábito PUNTUAL: una tarea única.
+#      Queda pendiente día a día hasta que se marca hecha UNA vez; ahí
+#      queda completada para siempre (no se repite).
+#    - recurrente: true → hábito RECURRENTE: se repite día a día sin
+#      fin definido mientras el objetivo esté activo; la app calcula
+#      racha y porcentaje de cumplimiento, pero el hábito en sí nunca
+#      queda "terminado".
+# 7. Completado del objetivo (no lo escribas en el YAML, es automático):
+#    - Si TODOS los hábitos del objetivo son puntuales → el objetivo se
+#      completa solo, automáticamente, cuando están todos marcados hechos.
+#    - Si el objetivo tiene AL MENOS UN hábito recurrente → no hay forma
+#      automática de saber cuándo "se logró", así que se completa a
+#      mano desde la app (botón "Marcar objetivo como completado").
+#    → Si querés que un objetivo avance solo, no le pongas ningún
+#      hábito recurrente. Si preferís decidir vos cuándo se da por
+#      logrado, agregale al menos uno.
+# 8. No hay metas numéricas (nada de "3 veces por semana"): todo hábito
+#    es binario, hecho o no hecho, ese es el único estado que soporta
+#    el formato.
+# 9. Los títulos (de proyecto, objetivo y hábito) tienen que ser SIMPLES,
+#    cortos y SIN EMOJIS. Se muestran en espacios muy angostos (bloques
+#    de la grilla horaria de pocos px de alto/ancho) y los emojis o
+#    textos largos se cortan o se ven mal ahí.
+#
+# Formato de fecha y hora: siempre entre COMILLAS (ej. fecha: "2026-08-10",
+# hora_inicio: "19:00"). Sin comillas, algunos parsers YAML interpretan
+# esos valores como un tipo nativo (fecha, o número sexagesimal en el
+# caso de la hora) en vez de texto, y puede fallar la importación.
+# ------------------------------------------------------------------------
+
+proyecto: <nombre del proyecto>
+descripcion: <descripción opcional del proyecto>
+
+objetivos:
+  - nombre: <nombre del objetivo 1>
+    descripcion: <descripción opcional>
+    habitos:
+      - titulo: <título del hábito 1>
+        descripcion: <descripción opcional>
+        fecha: "<AAAA-MM-DD>"
+        hora_inicio: "<HH:MM>"
+        hora_fin: "<HH:MM>"
+        recurrente: <true o false>
+      - titulo: <título del hábito 2>
+        fecha: "<AAAA-MM-DD>"
+        hora_inicio: "<HH:MM>"
+        hora_fin: "<HH:MM>"
+        recurrente: <true o false>
+      # agregá tantos hábitos como necesite este objetivo
+
+  - nombre: <nombre del objetivo 2>
+    descripcion: <descripción opcional>
+    habitos:
+      - titulo: <título del hábito 1>
+        fecha: "<AAAA-MM-DD>"
+        hora_inicio: "<HH:MM>"
+        hora_fin: "<HH:MM>"
+        recurrente: <true o false>
+      # agregá tantos hábitos como necesite este objetivo
+
+  # agregá tantos objetivos como necesites, en el orden en que se van a desbloquear
