@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { Upload, Trash2, ChevronRight, CheckCircle2, Download } from "lucide-react";
+import { Upload, Trash2, ChevronRight, CheckCircle2, Download, Smartphone } from "lucide-react";
 import { C } from "../lib/theme.js";
 import { projectProgress, isObjectiveManual } from "../lib/model.js";
 import { downloadAvailabilityYaml } from "../lib/exportYaml.js";
@@ -7,15 +7,18 @@ import YearRail from "./YearRail.jsx";
 import TodayChecklist from "./TodayChecklist.jsx";
 import WeekSchedule from "./WeekSchedule.jsx";
 import ConfirmModal from "./ConfirmModal.jsx";
+import SyncModal from "./SyncModal.jsx";
 
 export default function ProjectList({
   projects, onImport, onOpen, onDelete, onToggleRecurring, onToggleSpecific, onChangeColor, onCompleteManual,
   blocks, onAddBlock, onUpdateBlock, onDeleteBlock,
+  syncCode, syncStatus, onConnectNewCode, onConnectExistingCode, onDisconnectSync,
 }) {
   const fileRef = useRef(null);
   const [error, setError] = useState(null);
   const [busy, setBusy] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
+  const [syncModalOpen, setSyncModalOpen] = useState(false);
 
   const pickFile = () => fileRef.current && fileRef.current.click();
 
@@ -39,9 +42,15 @@ export default function ProjectList({
     <div>
       <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 10, marginBottom: 4 }}>
         <div className="eyebrow" style={{ color: C.dim }}>Habitual</div>
-        <button onClick={() => downloadAvailabilityYaml(projects, blocks)} className="step" aria-label="Descargar disponibilidad (YAML)" title="Descargar proyectos y horarios fijos (YAML)" style={{ color: C.dim }}>
-          <Download size={15} />
-        </button>
+        <div style={{ display: "flex", gap: 6 }}>
+          <button onClick={() => setSyncModalOpen(true)} className="step" aria-label="Sincronizar entre dispositivos" title="Sincronizar entre dispositivos" style={{ color: syncCode ? "#3fb79a" : C.dim, position: "relative" }}>
+            <Smartphone size={15} />
+            {syncCode && <span style={{ position: "absolute", top: 4, right: 4, width: 6, height: 6, borderRadius: 6, background: "#3fb79a" }} />}
+          </button>
+          <button onClick={() => downloadAvailabilityYaml(projects, blocks)} className="step" aria-label="Descargar disponibilidad (YAML)" title="Descargar proyectos y horarios fijos (YAML)" style={{ color: C.dim }}>
+            <Download size={15} />
+          </button>
+        </div>
       </div>
       <h1 style={{ margin: "0 0 14px", fontSize: 26, fontWeight: 800, letterSpacing: "-.01em" }}>Tus proyectos</h1>
 
@@ -128,6 +137,17 @@ export default function ProjectList({
           danger
           onCancel={() => setDeleteTarget(null)}
           onConfirm={() => { onDelete(deleteTarget.id); setDeleteTarget(null); }}
+        />
+      )}
+
+      {syncModalOpen && (
+        <SyncModal
+          code={syncCode}
+          status={syncStatus}
+          onClose={() => setSyncModalOpen(false)}
+          onConnectNew={onConnectNewCode}
+          onConnectExisting={onConnectExistingCode}
+          onDisconnect={onDisconnectSync}
         />
       )}
     </div>
