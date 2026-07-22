@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.habitual.app",
+      "sha256_cert_fingerprints": [
+        "C7:C4:23:4C:E2:3B:BA:57:F7:FC:CB:07:B3:CF:F9:07:5A:5D:C3:77:BD:2B:03:62:C4:68:35:E0:D9:8C:D9:D2"
+      ]
+    }
+  }
+]
