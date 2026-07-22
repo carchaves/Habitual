@@ -9,9 +9,9 @@ export default defineConfig({
       registerType: "autoUpdate",
       includeAssets: ["icon-192.png", "icon-512.png"],
       manifest: {
-        name: "Habitual — Plan 2026",
+        name: "Habitual",
         short_name: "Habitual",
-        description: "Seguimiento semanal del plan 2026: rutinas, escalada, francés, chino, lectura y peso.",
+        description: "Proyectos, objetivos y hábitos: seguimiento diario con horario semanal y estadísticas.",
         start_url: "/",
         display: "standalone",
         background_color: "#14161d",
