@@ -59,11 +59,13 @@ export default function ProjectList({
 
       <YearRail projects={projects} selectedWeekKey={selectedWeekKey} onSelectWeek={setSelectedWeekKey} />
 
-      <TodayChecklist projects={projects} onToggleRecurring={onToggleRecurring} onToggleSpecific={onToggleSpecific} />
+      {!selectedWeekStart && (
+        <TodayChecklist projects={projects} onToggleRecurring={onToggleRecurring} onToggleSpecific={onToggleSpecific} />
+      )}
 
       <WeekSchedule
         projects={projects} blocks={blocks} onAddBlock={onAddBlock} onUpdateBlock={onUpdateBlock} onDeleteBlock={onDeleteBlock}
-        weekStart={selectedWeekStart} showHabits={!selectedWeekStart} onClearWeek={() => setSelectedWeekKey(null)}
+        weekStart={selectedWeekStart} onClearWeek={() => setSelectedWeekKey(null)}
       />
 
       <div className="eyebrow" style={{ color: C.dim, marginBottom: 8 }}>Proyectos</div>

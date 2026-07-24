@@ -74,25 +74,23 @@ function FixedBand({ band, minHour, maxHour }) {
   );
 }
 
-export default function WeekSchedule({ projects, blocks, onAddBlock, onUpdateBlock, onDeleteBlock, weekStart, showHabits = true, onClearWeek }) {
+export default function WeekSchedule({ projects, blocks, onAddBlock, onUpdateBlock, onDeleteBlock, weekStart, onClearWeek }) {
   const [modalMode, setModalMode] = useState(null); // null | "add" | "manage"
   const monday = mondayOf(weekStart || new Date());
   const days = Array.from({ length: 7 }, (_, i) => addDays(monday, i));
   const today = todayKey();
 
-  const projectsWithHabits = showHabits ? projects.filter((p) => p.objectives.some((o) => o.status === STATUS.ACTIVE)) : [];
+  const projectsWithHabits = projects.filter((p) => p.objectives.some((o) => o.status === STATUS.ACTIVE));
 
   const byDay = days.map((d, i) => {
     const dayKey = fmtKey(d);
     const timed = [];
-    if (showHabits) {
-      for (const p of projects) {
-        const objective = p.objectives.find((o) => o.status === STATUS.ACTIVE);
-        if (!objective) continue;
-        for (const h of objective.habits) {
-          if (!hasValidTime(h) || !habitAppearsOnDay(h, dayKey)) continue;
-          timed.push({ habit: h, project: p, start: hhmmToFloat(h.time), end: hhmmToFloat(h.endTime) });
-        }
+    for (const p of projects) {
+      const objective = p.objectives.find((o) => o.status === STATUS.ACTIVE);
+      if (!objective) continue;
+      for (const h of objective.habits) {
+        if (!hasValidTime(h) || !habitAppearsOnDay(h, dayKey)) continue;
+        timed.push({ habit: h, project: p, start: hhmmToFloat(h.time), end: hhmmToFloat(h.endTime) });
       }
     }
     const dayBlocks = [];
@@ -119,7 +117,7 @@ export default function WeekSchedule({ projects, blocks, onAddBlock, onUpdateBlo
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <div className="eyebrow" style={{ color: C.dim }}>Horario</div>
-          {!showHabits && (
+          {weekStart && (
             <button onClick={onClearWeek} className="mono" style={{ display: "flex", alignItems: "center", gap: 3, background: C.panel2, color: C.dim, fontSize: 10.5, borderRadius: 6, padding: "2px 7px" }}>
               {monday.toLocaleDateString("es-AR", { day: "numeric", month: "short" })}–{days[6].toLocaleDateString("es-AR", { day: "numeric", month: "short" })}
               <X size={11} />
