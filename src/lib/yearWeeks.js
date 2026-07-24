@@ -33,11 +33,9 @@ export function countHabitsByWeek(projects, weeks) {
   return counts;
 }
 
-// Azul (pocos hábitos) -> rojo (muchos), pasando por celeste/verde/amarillo/naranja.
-export function heatColor(count, max) {
-  const t = max > 0 ? Math.min(1, count / max) : 0;
-  const hue = 210 - t * 210;
-  return `hsl(${hue}, 75%, 55%)`;
+// Un color distinto por mes (0=enero .. 11=diciembre), estable durante todo el año.
+export function monthColor(monthIndex) {
+  return `hsl(${monthIndex * 30}, 65%, 55%)`;
 }
 
 // Agrupa semanas consecutivas del mismo mes para las etiquetas debajo del riel.

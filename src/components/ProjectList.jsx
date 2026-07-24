@@ -3,6 +3,7 @@ import { Upload, Trash2, ChevronRight, CheckCircle2, Download, Smartphone } from
 import { C } from "../lib/theme.js";
 import { projectProgress, isObjectiveManual } from "../lib/model.js";
 import { downloadAvailabilityYaml } from "../lib/exportYaml.js";
+import { parseDateKey } from "../lib/dates.js";
 import YearRail from "./YearRail.jsx";
 import TodayChecklist from "./TodayChecklist.jsx";
 import WeekSchedule from "./WeekSchedule.jsx";
@@ -19,6 +20,8 @@ export default function ProjectList({
   const [busy, setBusy] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [syncModalOpen, setSyncModalOpen] = useState(false);
+  const [selectedWeekKey, setSelectedWeekKey] = useState(null);
+  const selectedWeekStart = selectedWeekKey ? parseDateKey(selectedWeekKey) : null;
 
   const pickFile = () => fileRef.current && fileRef.current.click();
 
@@ -54,11 +57,14 @@ export default function ProjectList({
       </div>
       <h1 style={{ margin: "0 0 14px", fontSize: 26, fontWeight: 800, letterSpacing: "-.01em" }}>Tus proyectos</h1>
 
-      <YearRail projects={projects} />
+      <YearRail projects={projects} selectedWeekKey={selectedWeekKey} onSelectWeek={setSelectedWeekKey} />
 
       <TodayChecklist projects={projects} onToggleRecurring={onToggleRecurring} onToggleSpecific={onToggleSpecific} />
 
-      <WeekSchedule projects={projects} blocks={blocks} onAddBlock={onAddBlock} onUpdateBlock={onUpdateBlock} onDeleteBlock={onDeleteBlock} />
+      <WeekSchedule
+        projects={projects} blocks={blocks} onAddBlock={onAddBlock} onUpdateBlock={onUpdateBlock} onDeleteBlock={onDeleteBlock}
+        weekStart={selectedWeekStart} showHabits={!selectedWeekStart} onClearWeek={() => setSelectedWeekKey(null)}
+      />
 
       <div className="eyebrow" style={{ color: C.dim, marginBottom: 8 }}>Proyectos</div>
 

@@ -1,14 +1,13 @@
 import React from "react";
 import { C } from "../lib/theme.js";
 import { atMidnight } from "../lib/dates.js";
-import { remainingWeeksOfYear, countHabitsByWeek, heatColor, monthSegments } from "../lib/yearWeeks.js";
+import { remainingWeeksOfYear, countHabitsByWeek, monthColor, monthSegments } from "../lib/yearWeeks.js";
 
-export default function YearRail({ projects }) {
+export default function YearRail({ projects, selectedWeekKey, onSelectWeek }) {
   const weeks = remainingWeeksOfYear();
   if (weeks.length === 0) return null;
 
   const counts = countHabitsByWeek(projects, weeks);
-  const max = Math.max(0, ...counts);
   const segments = monthSegments(weeks);
   const today = atMidnight(new Date());
 
@@ -20,10 +19,20 @@ export default function YearRail({ projects }) {
       <div style={{ display: "flex", gap: 3, alignItems: "flex-end", height: 30, marginBottom: 6 }}>
         {weeks.map((w, i) => {
           const isNow = today >= w.start && today <= w.end;
+          const isSelected = w.key === selectedWeekKey;
           return (
-            <span key={w.key} className={isNow ? "tick now" : "tick"}
+            <button
+              key={w.key}
+              onClick={() => onSelectWeek(isSelected ? null : w.key)}
+              className={isNow ? "tick now" : "tick"}
               title={`${w.start.toLocaleDateString("es-AR", { day: "numeric", month: "short" })} · ${counts[i]} hábito${counts[i] === 1 ? "" : "s"}`}
-              style={{ flex: 1, height: isNow ? 26 : 16, background: heatColor(counts[i], max), opacity: isNow ? 1 : 0.75, borderRadius: 3, outline: isNow ? `2px solid ${C.text}` : "none", outlineOffset: 1 }} />
+              style={{
+                flex: 1, height: isNow ? 26 : 16, background: monthColor(w.start.getMonth()),
+                opacity: isSelected ? 1 : isNow ? 1 : 0.75, borderRadius: 3, padding: 0,
+                outline: isSelected ? `2px solid ${C.text}` : isNow ? `2px solid ${C.text}` : "none",
+                outlineOffset: 1,
+              }}
+            />
           );
         })}
       </div>
@@ -31,12 +40,6 @@ export default function YearRail({ projects }) {
         {segments.map((s, i) => (
           <span key={i} style={{ flex: s.count, overflow: "hidden", whiteSpace: "nowrap" }}>{s.label}</span>
         ))}
-      </div>
-      <div style={{ display: "flex", alignItems: "center", gap: 7, fontSize: 10.5, color: C.dim }}>
-        <span>carga:</span>
-        <span>−</span>
-        <span style={{ flex: 1, maxWidth: 120, height: 5, borderRadius: 5, background: `linear-gradient(90deg, ${heatColor(0, 1)}, ${heatColor(1, 2)}, ${heatColor(1, 1)})` }} />
-        <span>+</span>
       </div>
     </div>
   );

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Plus, Pencil } from "lucide-react";
+import { Plus, Pencil, X } from "lucide-react";
 import { C } from "../lib/theme.js";
 import { addDays, fmtKey, todayKey } from "../lib/dates.js";
 import { mondayOf } from "../lib/yearWeeks.js";
@@ -74,23 +74,25 @@ function FixedBand({ band, minHour, maxHour }) {
   );
 }
 
-export default function WeekSchedule({ projects, blocks, onAddBlock, onUpdateBlock, onDeleteBlock }) {
+export default function WeekSchedule({ projects, blocks, onAddBlock, onUpdateBlock, onDeleteBlock, weekStart, showHabits = true, onClearWeek }) {
   const [modalMode, setModalMode] = useState(null); // null | "add" | "manage"
-  const monday = mondayOf(new Date());
+  const monday = mondayOf(weekStart || new Date());
   const days = Array.from({ length: 7 }, (_, i) => addDays(monday, i));
   const today = todayKey();
 
-  const projectsWithHabits = projects.filter((p) => p.objectives.some((o) => o.status === STATUS.ACTIVE));
+  const projectsWithHabits = showHabits ? projects.filter((p) => p.objectives.some((o) => o.status === STATUS.ACTIVE)) : [];
 
   const byDay = days.map((d, i) => {
     const dayKey = fmtKey(d);
     const timed = [];
-    for (const p of projects) {
-      const objective = p.objectives.find((o) => o.status === STATUS.ACTIVE);
-      if (!objective) continue;
-      for (const h of objective.habits) {
-        if (!hasValidTime(h) || !habitAppearsOnDay(h, dayKey)) continue;
-        timed.push({ habit: h, project: p, start: hhmmToFloat(h.time), end: hhmmToFloat(h.endTime) });
+    if (showHabits) {
+      for (const p of projects) {
+        const objective = p.objectives.find((o) => o.status === STATUS.ACTIVE);
+        if (!objective) continue;
+        for (const h of objective.habits) {
+          if (!hasValidTime(h) || !habitAppearsOnDay(h, dayKey)) continue;
+          timed.push({ habit: h, project: p, start: hhmmToFloat(h.time), end: hhmmToFloat(h.endTime) });
+        }
       }
     }
     const dayBlocks = [];
@@ -115,7 +117,15 @@ export default function WeekSchedule({ projects, blocks, onAddBlock, onUpdateBlo
   return (
     <div style={{ marginBottom: 20 }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
-        <div className="eyebrow" style={{ color: C.dim }}>Horario</div>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <div className="eyebrow" style={{ color: C.dim }}>Horario</div>
+          {!showHabits && (
+            <button onClick={onClearWeek} className="mono" style={{ display: "flex", alignItems: "center", gap: 3, background: C.panel2, color: C.dim, fontSize: 10.5, borderRadius: 6, padding: "2px 7px" }}>
+              {monday.toLocaleDateString("es-AR", { day: "numeric", month: "short" })}–{days[6].toLocaleDateString("es-AR", { day: "numeric", month: "short" })}
+              <X size={11} />
+            </button>
+          )}
+        </div>
         <div style={{ display: "flex", gap: 6 }}>
           <button onClick={() => setModalMode("manage")} className="step" aria-label="Editar horarios fijos" title="Editar horarios fijos" style={{ width: 24, height: 24, color: C.dim }}>
             <Pencil size={13} />
